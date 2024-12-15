@@ -16,4 +16,21 @@ export class DocumentsService {
     const document = this.documentRepository.create(createDocumentDto);
     return this.documentRepository.save(document);
   }
-}
+  async findAll(page: number, limit: number, fileType?: string, title?: string): Promise<Document[]> {
+    const skip = (page - 1) * limit;
+    const options: any = {
+      skip,
+      take: limit,
+      where: {},
+    };
+
+    if (fileType) {
+      options.where.fileType = fileType;
+    }
+
+    if (title) {
+      options.where.title = title;
+    }
+
+    return this.documentRepository.find(options);
+  }
