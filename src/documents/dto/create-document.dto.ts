@@ -10,9 +10,6 @@ export class CreateDocumentDto {
   @IsString()
   content: string;
 
-  @IsNotEmpty()
-  @IsString()
-  fileType: string;
 
   @IsNotEmpty()
   @IsNumber()
