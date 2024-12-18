@@ -1,5 +1,7 @@
 // src/documents/documents.controller.ts
-import { Controller, Post, Get, Body, Query } from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, UploadedFile, UseInterceptors } from
+'@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { QueryDocumentsDto } from './dto/query-documents.dto';
@@ -10,10 +12,12 @@ export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
   async createDocument(
+    @UploadedFile() file: Express.Multer.File,
     @Body() createDocumentDto: CreateDocumentDto,
   ): Promise<Omit<Document, 'content'>> {
-    const document = await this.documentsService.create(createDocumentDto);
+    const document = await this.documentsService.create(createDocumentDto, file);
     return {
       documentID: document.documentID,
       title: document.title,
