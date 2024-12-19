@@ -1,6 +1,8 @@
 // src/documents/documents.controller.ts
 import { Controller, Post, Get, Body, Query, UploadedFile, UseInterceptors } from
 '@nestjs/common';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
@@ -12,7 +14,29 @@ export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', {
+    fileFilter: (req, file, callback) => {
+      const allowedMimeTypes = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // DOCX
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // XLSX
+        'image/jpeg',
+        'image/png'
+      ];
+      if (allowedMimeTypes.includes(file.mimetype)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Invalid file type'), false);
+      }
+    },
+    storage: diskStorage({
+      destination: './uploads', // Ensure this directory exists
+      filename: (req, file, callback) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        callback(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
+      }
+    })
+  }))
   async createDocument(
     @UploadedFile() file: Express.Multer.File,
     @Body() createDocumentDto: CreateDocumentDto,
