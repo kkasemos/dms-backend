@@ -9,21 +9,23 @@ import { QueryDocumentsDto } from './dto/query-documents.dto';
 
 @Injectable()
 export class DocumentsService {
+  minioClient: Minio.Client;
+
   constructor(
     @InjectRepository(Document)
     private readonly documentRepository: Repository<Document>,
   ) {
     this.minioClient = new Minio.Client({
-      endPoint: 'YOUR_MINIO_ENDPOINT',
-      port: YOUR_MINIO_PORT,
+      endPoint: 'localhost',
+      port: 9000,
       useSSL: false, // or true if your MinIO server uses SSL
-      accessKey: 'YOUR_MINIO_ACCESS_KEY',
-      secretKey: 'YOUR_MINIO_SECRET_KEY',
+      accessKey: 'Hch55VUEqJPO1pmB6Udw',
+      secretKey: 'emfwh2k4LF9GGS18nyFulKGDTRb9JM2tET5oJwXs',
     });
   }
 
   async create(createDocumentDto: CreateDocumentDto, file: Express.Multer.File): Promise<Document> {
-    const bucketName = 'your-bucket-name';
+    const bucketName = 'dms';
     const objectName = `${Date.now()}-${file.originalname}`;
 
     try {
