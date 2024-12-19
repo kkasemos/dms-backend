@@ -25,6 +25,7 @@ export class DocumentsService {
   }
 
   async create(createDocumentDto: CreateDocumentDto, file: Express.Multer.File): Promise<Document> {
+    const fileType = file.mimetype;
     const bucketName = 'dms';
     const objectName = `${Date.now()}-${file.originalname}`;
 
@@ -39,6 +40,7 @@ export class DocumentsService {
       const document = this.documentRepository.create({
         ...createDocumentDto,
         content: objectName,
+        fileType
       });
       return this.documentRepository.save(document);
     } catch (error) {

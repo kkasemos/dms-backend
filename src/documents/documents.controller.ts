@@ -17,8 +17,7 @@ export class DocumentsController {
     @UploadedFile() file: Express.Multer.File,
     @Body() createDocumentDto: CreateDocumentDto,
   ): Promise<Omit<Document, 'content'>> {
-    const fileType = file.mimetype;
-    const document = await this.documentsService.create({ ...createDocumentDto, fileType }, file);
+    const document = await this.documentsService.create({ ...createDocumentDto }, file);
     return {
       documentID: document.documentID,
       title: document.title,
