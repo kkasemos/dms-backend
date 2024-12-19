@@ -1,6 +1,6 @@
 // src/documents/documents.controller.ts
-import { Controller, Post, Get, Body, Query, UploadedFile, UseInterceptors } from
-'@nestjs/common';
+import { Controller, Post, Get, Body, Query, UploadedFile, UseInterceptors, UseFilters } from '@nestjs/common';
+import { FileFormatExceptionFilter } from './file-format-exception.filter';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -10,6 +10,7 @@ import { QueryDocumentsDto } from './dto/query-documents.dto';
 import { Document } from './documents.entity';
 
 @Controller('documents')
+@UseFilters(FileFormatExceptionFilter)
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
@@ -26,7 +27,7 @@ export class DocumentsController {
       if (allowedMimeTypes.includes(file.mimetype)) {
         callback(null, true);
       } else {
-        callback(new Error('Invalid file type'), false);
+        callback(new BadRequestException('Unsupported file format'), false);
       }
     },
     storage: diskStorage({
