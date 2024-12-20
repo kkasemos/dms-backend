@@ -1,8 +1,6 @@
 // src/documents/documents.controller.ts
-import { Controller, Post, Get, Body, Query, UploadedFile, UseInterceptors, UseFilters } from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, UploadedFile, UseInterceptors, UseFilters, BadRequestException } from '@nestjs/common';
 import { FileFormatExceptionFilter } from './file-format-exception.filter';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
@@ -29,14 +27,7 @@ export class DocumentsController {
       } else {
         callback(new BadRequestException('Unsupported file format'), false);
       }
-    },
-    storage: diskStorage({
-      destination: './uploads', // Ensure this directory exists
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        callback(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
-      }
-    })
+    }
   }))
   async createDocument(
     @UploadedFile() file: Express.Multer.File,
